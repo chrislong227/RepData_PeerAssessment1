@@ -7,13 +7,15 @@ output: html_document
 
 ### Loading and preprocessing the data
 
-```{r, echo = TRUE}
+
+```r
 activityData = read.csv("activity.csv", colClasses = "character")
 ```
 
 ### What is mean total number of steps taken per day?
 
-```{r, echo = TRUE}
+
+```r
 dates = levels(as.factor(activityData[ , 2]))
 
 dailySteps = data.frame()
@@ -26,12 +28,16 @@ for(i in 1:length(dates)) {
 ```
 
 Show the histogram
-```{r}
+
+```r
 hist(dailySteps[ , 1], main = "Everyday total number of steps", xlab = "Number of steps")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
 Calculate and report the mean and median
-```{r}
+
+```r
 ## Ignore the NAs
 completeData = dailySteps[complete.cases(dailySteps), ]
 
@@ -40,14 +46,27 @@ medianStep = median(completeData[ , 1])
 ```
 
 Thus the mean and median step numbers are:
-```{r}
+
+```r
 print(meanStep)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 print(medianStep)
+```
+
+```
+## [1] 10765
 ```
 
 ### What is the average daily activity pattern?
 
-```{r, echo = TRUE}
+
+```r
 activityData[ , 3] = as.numeric(activityData[ , 3])
 
 intervalLevel = levels(as.factor(activityData[ , 3]))
@@ -55,7 +74,8 @@ intervals = as.numeric(intervalLevel)
 ```
 
 Put the interval data in the order from smallest to largest
-```{r, echo = TRUE}
+
+```r
 intervals = intervals[order(intervals)]
 
 meanIntervals = data.frame()
@@ -70,24 +90,39 @@ for(i in 1:length(intervals)) {
 plot(meanIntervals, type = "l", xlab = "Interval", ylab = "Number of steps")
 ```
 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+
 Find which 5-minute interval contains the maximum number of steps
-```{r, echo = TRUE}
+
+```r
 maxStep = max(meanIntervals[ , 2])
 maxInterval = meanIntervals[meanIntervals[ , 2] == maxStep, ]
 print(maxInterval)
 ```
 
+```
+##      V1       V2
+## 104 835 206.1698
+```
+
 ### Imputing missing values
 
 Impute missing values using the mean steps of each intervals
-```{r, echo = TRUE}
+
+```r
 ## Calculate the number of NAs
 ## Load the data another time for calculation related to NAs
 activityData1 = read.csv("activity.csv", colClasses = "character")
 # Total number of missing values in the dataset
 numNAs = sum(is.na(activityData1[ , 1]))
 print(numNAs)
+```
 
+```
+## [1] 2304
+```
+
+```r
 ## Impute missing values using the mean steps of each intervals
 NARows = activityData1[!complete.cases(activityData1), ]
 rowNum = as.numeric(rownames(NARows))
@@ -106,20 +141,35 @@ for(i in 1:length(dates)) {
 
 ## Show the new histogram and new mean and median
 hist(dailySteps1[ , 1], main = "Everyday total number of steps (revised)", xlab = "Number of steps")
+```
 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
+
+```r
 meanStep1 = mean(dailySteps1[ , 1])
 medianStep1 = median(dailySteps1[ , 1])
 
 print(meanStep1)
-print(medianStep1)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
+print(medianStep1)
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean remains the same because I am using the mean value to replace the NAs. While the median becomes 10766.19
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-```{r, echo = TRUE}
+
+```r
 ## Generate the 3rd column showing weekdays and weekends
 weekDays = rep("weekday", 288*5)
 weekEnds = rep("weekend", 288*2)
@@ -128,7 +178,19 @@ activityData2 = cbind(activityData, weekData)
 
 ## The new dataset would be like this
 head(activityData2)
+```
 
+```
+##   steps       date interval weekData
+## 1  <NA> 2012-10-01        0  weekday
+## 2  <NA> 2012-10-01        5  weekday
+## 3  <NA> 2012-10-01       10  weekday
+## 4  <NA> 2012-10-01       15  weekday
+## 5  <NA> 2012-10-01       20  weekday
+## 6  <NA> 2012-10-01       25  weekday
+```
+
+```r
 ## Use the same method to calculate the mean number of steps in intervals of weekdays and weekends
 activityWeekDays = activityData2[activityData2[ , 4] == "weekday", ]
 intervalLevelWD = levels(as.factor(activityWeekDays[ , 3]))
@@ -173,3 +235,5 @@ dd = rbind(WD, WE)
 library(lattice)
 xyplot(v2~ v1 | factor(v3), data = dd, type = "l", xlab = "Interval", ylab = "Number of steps", layout = c(1, 2))
 ```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
